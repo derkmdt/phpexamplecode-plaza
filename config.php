@@ -12,7 +12,6 @@ define('BOL_PLAZAAPI_PRIVATE_KEY', 'your private test key');
 define('BOL_PLAZAAPI_SERVER', 'https://test-plazaapi.bol.com');
 
 define('BOL_PLAZAAPI_PORT', '443');
-define('BOL_PLAZAAPI_FORMAT', 'XML'); //XML or JSON (converted XmlToJson in request.php)
-define('BOL_PLAZAAPI_DEBUG_MODE', 'TRUE');
+define('BOL_PLAZAAPI_DEBUG_MODE', 1);
 
 ?>
