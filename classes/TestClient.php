@@ -9,22 +9,53 @@ class TestClient {
     }
 
     public function getOrders() {
-        $response = $this->requestHelper->fetch('GET', '/services/rest/orders/v1/open');
-
-        return $response;
+        $httpResponse = $this->requestHelper->fetch('GET', '/services/rest/orders/v1/open/');
+        
+        if($httpResponse) {
+            $response = new SimpleXMLElement($httpResponse); 
+            $ns = $response->getNamespaces(true);
+            $result = $response->children($ns['bns']);
+        } else $result = $this->requestHelper->getFullHeader();
+        
+        return $result;
     }
 
     public function getProcess($id,$queryParams='') {
-        $response = $this->requestHelper->fetch('GET', '/services/rest/orders/v1/process/' . $id, $queryParams);
+        $httpResponse = $this->requestHelper->fetch('GET', '/services/rest/orders/v1/process/' . $id, $queryParams);
 
-        return $response;
+        if($httpResponse) {
+            $response = new SimpleXMLElement($httpResponse); 
+            $ns = $response->getNamespaces(true);
+            $result = $response->children($ns['bns']);
+        } else $result = $this->requestHelper->getFullHeader();
+        
+        return $result;
     }
 
     public function setProcess($id,$queryParams='',$content='') {
-        $response = $this->requestHelper->fetch('POST', '/services/rest/orders/v1/process/' . $id, $queryParams, $content);
-
-        return $response;
+        $httpResponse = $this->requestHelper->fetch('POST', '/services/rest/orders/v1/process/' . $id, $queryParams, $content);
+        
+        if($httpResponse) {
+            $response = new SimpleXMLElement($httpResponse); 
+            $ns = $response->getNamespaces(true);
+            $result = $response->children($ns['bns']);
+        } else $result = $this->requestHelper->getFullHeader();
+        
+        return $result;
     }
+
+    public function getPayments($yearmonth,$queryParams='') {
+        //{YearMonth}
+        $httpResponse = $this->requestHelper->fetch('GET', '/services/rest/payments/v1/payments/' . $yearmonth, $queryParams);
+        
+        if($httpResponse) {
+            $response = new SimpleXMLElement($httpResponse); 
+            $ns = $response->getNamespaces(true);
+            $result = $response->children($ns['bns']);
+        } else $result = $this->requestHelper->getFullHeader();
+        
+        return $result;
+    } 
 
     public function getFullHeader() {
         return $this->requestHelper->getFullHeader();

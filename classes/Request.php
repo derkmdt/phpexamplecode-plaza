@@ -3,7 +3,8 @@
 class Request {
     const SERVER = BOL_PLAZAAPI_SERVER;
     const PORT = BOL_PLAZAAPI_PORT;
-    const DEBUG = BOL_PLAZAAPI_DEBUG_MODE;   
+    const DEBUG = BOL_PLAZAAPI_DEBUG_MODE;
+  
     private $accessKey;
     private $secretAccessKey;
     private $httpResponseCode;
@@ -19,8 +20,6 @@ class Request {
     }
     
     public function fetch($httpMethod, $uri, $parameters='', $content='') {
-
-        if(self::DEBUG) echo '<pre>Debug info<br><br>-----<br><br>'.self::SERVER.$uri.$parameters.'<br>content:<br>'.htmlspecialchars($content).'<br><br>----<br></pre>';
         
         switch($httpMethod) {
             default:
@@ -59,6 +58,7 @@ class Request {
         //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         //curl_setopt($ch, CURLOPT_CAINFO, $_SERVER['DOCUMENT_ROOT'] . '/certs/cacert.pem');
+        
 		if($httpMethod == 'POST') {
 			curl_setopt ($ch, CURLOPT_POST, true);
 			curl_setopt ($ch, CURLOPT_POSTFIELDS, $content);
@@ -68,9 +68,9 @@ class Request {
             print_r(curl_errno($ch), true);
         }
         $result = curl_exec($ch);
-   
+
         curl_close($ch);
-    
+        
         $result = str_replace('xmlns:bns="http://plazaapi.bol.com/services/xsd/plazaapiservice-1.0.xsd"', 'xmlns:bns="http://plazaapi.bol.com/services/xsd/plazaapiservice-v1.xsd"', $result);
         
         $this->httpResponseCode = intval(substr($result, 9, 3));
@@ -80,15 +80,20 @@ class Request {
             $this->httpFullHeader = $aResult[0];
             $response = "<?xml".$aResult[1];
             if (!count((array)$result)) {
-                $result = $this->httpFullHeader; 
-            } else {   
-                $response = new SimpleXMLElement($response);
-                $ns = $response->getNamespaces(true);
-                $result = $response->children($ns['bns']);
+                $result = $this->httpFullHeader;
+            } else {
+                $result = $response;
             }
         } else {
             $this->httpFullHeader = $result;
             $result=FALSE;
+        }
+
+        if(self::DEBUG) {
+            echo '<pre>Debug info<br><br>-----<br><br><strong>call:</strong><br>'.self::SERVER.$uri.$parameters.'<br><br>';
+            if ($content) echo '<br>content:<br>'.htmlspecialchars($content).'<br><br>';
+            echo '<strong>header response:</strong><br>'.self::getFullHeader();
+            echo '----</pre>';
         }
         
         return $result;

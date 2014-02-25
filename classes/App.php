@@ -7,14 +7,17 @@ class App {
 	    self::$testClient = new TestClient(BOL_PLAZAAPI_PUBLIC_KEY, BOL_PLAZAAPI_PRIVATE_KEY);
         $servername = str_replace("www.", "", $_SERVER['SERVER_NAME']);
         $rooturl = 'http://'.$servername.$_SERVER['SCRIPT_NAME'];
+
         print('<html><body style="margin:20px;"><h4>PHP example code</h4>');
         print('<ul>');
         print('<li><a href="'.$rooturl.'?action=getorders">GET /services/rest/orders/v1/open/</a> (<a href="'.$rooturl.'?action=getordersraw">* raw xml</a>)</li>');
-        print('<li><a href="'.$rooturl.'?action=getprocess">GET /services/rest/orders/v1/process/{id}</a> (<a href="'.$rooturl.'?action=getprocessraw">* raw xml</a>)</li>');
+        print('<li><a href="'.$rooturl.'?action=getprocess">GET /services/rest/orders/v1/process/{id} (succes)</a> (<a href="'.$rooturl.'?action=getprocessraw">* raw xml</a>)</li>');
 		print('<li><a href="'.$rooturl.'?action=setprocess">POST /services/rest/orders/v1/process/</a></li>');
+        print('<li><a href="'.$rooturl.'?action=getpayments">GET /services/rest/payments/v1/payments/{monthyear}</a> (<a href="'.$rooturl.'?action=getpaymentsraw">* raw xml</a>)</li>');
 		print('</ul>');
         //print('Download dit voorbeeld op <a href="https://github.com/devbolcom/phpexamplecodelibrary">https://github.com/devbolcom/phpexamplecodelibrary</a>.<br>');
 		print('----');
+        
         //convert html characters in $_REQUEST params for Cross-site scripting (XSS)
 		foreach ($_REQUEST as $key => $value) {
 			$params[$key] = htmlspecialchars($value);
@@ -23,6 +26,7 @@ class App {
 	    $action = isset($params['action']) ? $params['action'] : "default";
 	    switch($action) {
 	        case 'default':
+                self::getOrders(true,$params);
 	            break;
 	        case 'getorders':
 	            self::getOrders(false,$params);
@@ -39,6 +43,12 @@ class App {
             case 'setprocess':
                 self::setProcess(false,$params);
                 break;
+            case 'getpayments':
+                self::getPayments(false,$params);
+                break;
+            case 'getpaymentsraw':
+                self::getPayments(true,$params);
+                break;
 	    }
 		
 	}
@@ -47,12 +57,13 @@ class App {
 	    //orders request /services/rest/orders/v1/open/ + queryParams
         $xmlResponse = self::$testClient->getOrders();
         if($bRaw) {
-            self::printValue("Raw XML response");
+            self::printValue("<strong>Raw XML response</strong>");
             self::printValue('----');
             self::printValue($xmlResponse);
+            //echo '<form id="rawform" method="POST" action="view.php" target="_blank"><input type="hidden" value="'.urlencode($xmlResponse).'" name="content"><input type="submit" value="Show raw XML output"></form>';
         } else {
-            self::printValue("Response");
-            self::printValue('----');
+            self::printValue("<strong>Example response</strong>");
+            self::printValue("----");
 			foreach($xmlResponse->OpenOrder as $child) {
                 echo '<a href="'.$rooturl.'?action=getprocess&orderid='.$child->OrderId.'">'.$child->OrderId.'</a>';
 				echo "<br>";
@@ -67,12 +78,12 @@ class App {
         $xmlResponse = self::$testClient->getProcess($orderid);
 	    if($xmlResponse) {
 	        if($bRaw!=0) {
-	            self::printValue("Raw XML response");
-	            self::printValue('----');
+	            self::printValue("<strong>Raw XML response</strong>");
+                self::printValue('----');
 	            self::printValue($xmlResponse);
 	        } else {
-	            self::printValue("Response");
-	            self::printValue('----');
+	            self::printValue("<strong>Example response</strong>");
+                self::printValue('----');
 	        	self::printLine('<strong>ProcessOrderId: '.$xmlResponse->ProcessOrderId.'</strong>');
 				self::printLine('Process order status: '.$xmlResponse->Status);
 				foreach($xmlResponse->Order as $child) {
@@ -105,12 +116,37 @@ class App {
 		</ProcessOrders>';
         $xmlResponse = self::$testClient->setProcess($orderid,'',$field);
 	    if($xmlResponse) {
-            self::printValue("Raw XML response");
-            self::printValue('----');
+            self::printValue("<strong>Raw XML response</strong>");
+                self::printValue("<strong>Example response</strong>");
             self::printValue($xmlResponse);
 		} else {
+            self::printValue("<strong>Example response</strong>");
+		    self::printValue('----');
 			self::printLine('No data');
 		}
+        self::printValue(" ");
+    }
+
+
+    private static function getPayments($bRaw=0,$params='') {
+        //get order process /services/rest/payments/v1/payments/{yearmonth} + queryParams
+        if(!isset($params['yearmonth'])) $yearmonth = '201301'; else $yearmonth = urldecode($params['yearmonth']);
+        $xmlResponse = self::$testClient->getPayments($yearmonth);
+        if($xmlResponse) {
+            if($bRaw!=0) {
+                self::printValue("<strong>Raw XML response</strong>");
+                self::printValue('----');
+                self::printValue($xmlResponse);
+            } else {
+                self::printValue("<strong>Example response</strong>");
+                self::printValue('----');
+                foreach($xmlResponse->Payment as $child) {
+                    self::printLine('CreditInvoiceNumber '.$child->CreditInvoiceNumber.' - PaymentAmount: '.$child->PaymentAmount);
+                }
+            }
+        } else {
+            self::printLine('No data');
+        }
         self::printValue(" ");
     }
 
