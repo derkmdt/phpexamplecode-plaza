@@ -8,7 +8,8 @@ class App {
         $servername = str_replace("www.", "", $_SERVER['SERVER_NAME']);
         $rooturl = 'http://'.$servername.$_SERVER['SCRIPT_NAME'];
 
-        print('<html><body style="margin:20px;"><h4>PHP example code</h4>');
+        print('<html><body style="margin:20px;"><h4>PHP PLAZAAPI example code based on a client</h4>');
+        print('<p>Download the source of example and client at <a href="https://github.com/derkmdt/phpexamplecode-plaza" target="_blank">https://github.com/derkmdt/phpexamplecode-plaza</a></p>');
         print('<ul>');
         print('<li><a href="'.$rooturl.'?action=getorders">GET /services/rest/orders/v1/open/</a> (<a href="'.$rooturl.'?action=getordersraw">* raw xml</a>)</li>');
         print('<li><a href="'.$rooturl.'?action=getprocess">GET /services/rest/orders/v1/process/{id} (succes)</a> (<a href="'.$rooturl.'?action=getprocessraw">* raw xml</a>)</li>');
