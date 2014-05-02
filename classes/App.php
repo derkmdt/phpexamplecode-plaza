@@ -57,7 +57,7 @@ class App {
 	    //orders request /services/rest/orders/v1/open/ + queryParams
         $xmlResponse = self::$testClient->getOrders();
         if($bRaw) {
-            self::printValue("<strong>Raw XML response</strong>");
+            self::printValue("<strong>Simple XML response</strong>");
             self::printValue('----');
             self::printValue($xmlResponse);
             //echo '<form id="rawform" method="POST" action="view.php" target="_blank"><input type="hidden" value="'.urlencode($xmlResponse).'" name="content"><input type="submit" value="Show raw XML output"></form>';
@@ -77,19 +77,25 @@ class App {
         if(!isset($params['orderid'])) $orderid = '123'; else $orderid = urldecode($params['orderid']);
         $xmlResponse = self::$testClient->getProcess($orderid);
 	    if($xmlResponse) {
-	        if($bRaw!=0) {
-	            self::printValue("<strong>Raw XML response</strong>");
-                self::printValue('----');
-	            self::printValue($xmlResponse);
+	        if($xmlResponse->errorCode) {
+	            self::printValue("<strong>Error</strong>");
+                    self::printValue('----');
+                    self::printValue($xmlResponse->errorMessage);
 	        } else {
-	            self::printValue("<strong>Example response</strong>");
-                self::printValue('----');
-	        	self::printLine('<strong>ProcessOrderId: '.$xmlResponse->ProcessOrderId.'</strong>');
-				self::printLine('Process order status: '.$xmlResponse->Status);
-				foreach($xmlResponse->Order as $child) {
-	        		self::printLine('Order '.$child->OrderId.' - Status: '.$child->OrderItemList->OrderItemData->Process);
-				}
-	        }
+    	        if($bRaw!=0) {
+    	            self::printValue("<strong>Simple XML response</strong>");
+                    self::printValue('----');
+    	            self::printValue($xmlResponse);
+    	        } else {
+    	            self::printValue("<strong>Example response</strong>");
+                    self::printValue('----');
+    	        	self::printLine('<strong>ProcessOrderId: '.$xmlResponse->ProcessOrderId.'</strong>');
+    				self::printLine('Process order status: '.$xmlResponse->Status);
+    				foreach($xmlResponse->Order as $child) {
+    	        		self::printLine('Order '.$child->OrderId.' - Status: '.$child->OrderItemList->OrderItemData->Process);
+    				}
+    	        }
+            }
 		} else {
 			self::printLine('No data');
 		}
@@ -116,8 +122,7 @@ class App {
 		</ProcessOrders>';
         $xmlResponse = self::$testClient->setProcess($orderid,'',$field);
 	    if($xmlResponse) {
-            self::printValue("<strong>Raw XML response</strong>");
-                self::printValue("<strong>Example response</strong>");
+            self::printValue("<strong>Simple XML response</strong>");
             self::printValue($xmlResponse);
 		} else {
             self::printValue("<strong>Example response</strong>");
@@ -134,7 +139,7 @@ class App {
         $xmlResponse = self::$testClient->getPayments($yearmonth);
         if($xmlResponse) {
             if($bRaw!=0) {
-                self::printValue("<strong>Raw XML response</strong>");
+                self::printValue("<strong>Simple XML response</strong>");
                 self::printValue('----');
                 self::printValue($xmlResponse);
             } else {

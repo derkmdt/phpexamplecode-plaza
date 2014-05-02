@@ -90,8 +90,9 @@ class Request {
         }
 
         if(self::DEBUG) {
-            echo '<pre>Debug info<br><br>-----<br><br><strong>call:</strong><br>'.self::SERVER.$uri.$parameters.'<br><br>';
-            if ($content) echo '<br>content:<br>'.htmlspecialchars($content).'<br><br>';
+            echo '<pre>Debug info<br><br>-----<br><br><strong>http request:</strong><br>'.self::SERVER.$uri.$parameters.'<br><br>';
+			echo '<strong>header request:</strong><br>'.print_r($httpheaderarray, 1).'<br><br>';
+            if ($content) echo '<strong>content:</strong><br>'.htmlspecialchars($content).'<br><br>';
             echo '<strong>header response:</strong><br>'.self::getFullHeader();
             echo '----</pre>';
         }
